@@ -1,6 +1,3 @@
-// Générique
-const compose = (...fns) => x => fns.reduceRight((y, f) => f(y), x);
-
 // Fonctions d'accumulation
 const cumulate = (array, accumulator, neutral = 0) => {
     const result = [];
@@ -20,42 +17,31 @@ const select = indexes => array => array.filter((_, index) => indexes.includes(i
 const extractAttributeValue = (attributeName, mapper) => element => mapper(element.attributes[attributeName].value);
 const extractNumericAttribute = attributeName => extractAttributeValue(attributeName, parseInt);
 const colspanExtractor = extractNumericAttribute('colspan');
+const cumulateColspans = row => cumulateAdd(Array.from(row.cells, colspanExtractor));
 const addClass = className => element => element.classList.add(className);
-
-// Spécifique à la problématique
-const computeGroups = table => {
-    const firstHeaderCells = Array.from(table.tHead.rows[0].cells);
-    const colspans = firstHeaderCells.map(colspanExtractor);
-    return compose(removeLast, cumulateAdd)(colspans);
+const getAllRows = table => concat(
+    // Headers
+    Array.from(table.tHead.rows),
+    // Bodies
+    Array.from(table.tBodies).flatMap(body => Array.from(body.rows))
+);
+const applyColumnGroupSeparator = table => {
+    const allRows = getAllRows(table);
+    // calcul des indices des colonnes où il faut ajouter la classe 'first-col-group'
+    const colspans = removeLast(cumulateColspans(allRows[0]));
+    // donne les cellules d'un ensemble de lignes où il faut ajouter la classe
+    const selectCells = rows => rows.flatMap(row => colspans.map(colspan => row.cells[colspan]));
+    // cellules où il faut ajouter la classe 'first-col-group'
+    const cells = concat(
+        // 1ere ligne du header
+        Array.from(allRows[0].cells),
+        // Les autres lignes
+        selectCells(removeFirst(allRows))
+    );
+    cells.forEach(addClass('first-col-group'));
 };
 
 document.addEventListener('DOMContentLoaded', () => {
     const table = document.getElementsByTagName('table')[0];
-
-    // 1ère ligne de header
-    const firstHeaderRow = table.tHead.rows[0];
-    // autres lignes du header
-    const otherHeaderRows = removeFirst(Array.from(table.tHead.rows));
-    // lignes des bodys
-    const bodyRows = Array.from(table.tBodies).flatMap(body => Array.from(body.rows));
-    
-    // Calcul des indices des colonnes où il faut ajouter la classe 'first-col-group'
-    const firstHeaderCells = Array.from(firstHeaderRow.cells);
-    const colspans = firstHeaderCells.map(colspanExtractor);
-    const groups = compose(removeLast, cumulateAdd)(colspans);
-
-
-    // donne les cellules d'un ensemble de lignes où il faut ajouter la classe
-    const selectGroupColumns = rows => rows.flatMap(row => groups.map(group => row.cells[group]));
-
-    // Cellules où il faut ajouter la classe 'first-col-group'
-    const cells = concat(
-        // 1ere ligne du header
-        Array.from(firstHeaderRow.cells),
-        // Les autres lignes du header
-        selectGroupColumns(otherHeaderRows),
-        // Les lignes du body
-        selectGroupColumns(bodyRows)
-    );
-    cells.forEach(addClass('first-col-group'));
+    applyColumnGroupSeparator(table);
 });

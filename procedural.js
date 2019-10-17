@@ -1,4 +1,4 @@
-function applyColumnGroupSeparator(table) {
+const applyColumnGroupSeparator = table => {
     const firstHeader = table.tHead.rows[0];
     // indices des colonnes où il faut ajouter la classe 'first-col-group'
     let groups = [];
