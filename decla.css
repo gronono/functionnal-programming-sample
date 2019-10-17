@@ -1,0 +1,11 @@
+
+thead > tr:nth-child(1) > th,
+thead > tr:nth-child(2) > th:nth-child(4),
+thead > tr:nth-child(2) > th:nth-child(6),
+thead > tr:nth-child(2) > th:nth-child(8),
+tbody > tr > td:nth-child(4),
+tbody > tr > td:nth-child(6),
+tbody > tr > td:nth-child(8)
+{
+    border-left: 1px solid lightgray;
+}

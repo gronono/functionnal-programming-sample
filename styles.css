@@ -1,0 +1,21 @@
+table {
+    border-collapse: collapse;
+    width: 500px;
+    border: 1px solid lightgray;
+}
+tr {
+    border-top: 1px solid lightgray;
+}
+
+td {
+    text-align: center;
+}
+
+.odd {
+    background-color: hsla(214, 61%, 25%, 0.05);
+}
+
+.first-col-group {
+    border-left: 1px solid lightgray;
+}
+
