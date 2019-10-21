@@ -1,4 +1,5 @@
-const applyColumnGroupSeparator = table => {
+document.addEventListener('DOMContentLoaded', () => {
+    const table = document.getElementsByTagName('table')[0];
     const firstHeader = table.tHead.rows[0];
     // indices des colonnes où il faut ajouter la classe 'first-col-group'
     let groups = [];
@@ -24,8 +25,4 @@ const applyColumnGroupSeparator = table => {
             }
         }
     }
-}
-document.addEventListener('DOMContentLoaded', () => {
-    const table = document.getElementsByTagName('table')[0];
-    applyColumnGroupSeparator(table);
 });
